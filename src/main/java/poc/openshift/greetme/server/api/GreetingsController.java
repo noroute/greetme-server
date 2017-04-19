@@ -35,7 +35,7 @@ public class GreetingsController {
     public ResponseEntity<Greeting> postPersonToGreet(@RequestBody Person person) {
         Greeting greeting = createAndStoreGreeting(person);
         URI location = createLocation(greeting);
-        log.debug("Created {} at location {}", greeting, location);
+        log.info("Created {} at location {}", greeting, location);
         return ResponseEntity.created(location).body(greeting);
     }
 
@@ -56,15 +56,19 @@ public class GreetingsController {
     @GetMapping(path = "/{id}", produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Greeting> getGreetingOfId(@PathVariable Long id) {
         if (!idToGreeting.containsKey(id)) {
+            log.info("Could not find Greeting of id={}", id);
             return ResponseEntity.notFound().build();
         }
 
         Greeting greeting = idToGreeting.get(id);
+        log.debug("Respond with {}", greeting);
         return ResponseEntity.ok().body(greeting);
     }
 
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
     public Collection<Greeting> getAllGreetings() {
-        return Collections.unmodifiableCollection(idToGreeting.values());
+        Collection<Greeting> greetings = Collections.unmodifiableCollection(idToGreeting.values());
+        log.debug("Respond with all Greetings: {}", greetings);
+        return greetings;
     }
 }

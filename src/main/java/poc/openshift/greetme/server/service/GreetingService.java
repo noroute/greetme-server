@@ -8,7 +8,7 @@ public class GreetingService {
 
     private static final String GREETING_TEMPLATE = "Hello, %s!";
 
-    public String greetName(String name) {
+    public String sayHelloTo(String name) {
         Validate.notEmpty(name);
         return String.format(GREETING_TEMPLATE, name);
     }

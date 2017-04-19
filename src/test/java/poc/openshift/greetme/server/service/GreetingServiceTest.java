@@ -10,17 +10,17 @@ public class GreetingServiceTest {
 
     @Test
     public void greets_with_hello_bob_if_name_is_bob() {
-        String message = greetingService.greetName("Bob");
+        String message = greetingService.sayHelloTo("Bob");
         assertThat(message).isEqualTo("Hello, Bob!");
     }
 
     @Test(expected = NullPointerException.class)
     public void throws_NullPointerException_if_name_is_null() {
-        greetingService.greetName(null);
+        greetingService.sayHelloTo(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void throws_IllegalArgumentException_if_name_is_empty() {
-        greetingService.greetName("");
+        greetingService.sayHelloTo("");
     }
 }

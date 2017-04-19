@@ -21,6 +21,6 @@ public class GreetingServiceTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void throws_IllegalArgumentException_if_name_is_empty() {
-        greetingService.sayHelloTo("");
+        greetingService.sayHelloTo("  ");
     }
 }

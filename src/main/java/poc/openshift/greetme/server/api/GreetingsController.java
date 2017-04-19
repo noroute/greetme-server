@@ -1,7 +1,6 @@
 package poc.openshift.greetme.server.api;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,16 +33,24 @@ public class GreetingsController {
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Greeting> postPersonToGreet(@RequestBody Person person) {
-        String message = greetingService.greetName(person.getName());
+        Greeting greeting = createAndStoreGreeting(person);
+        URI location = createLocation(greeting);
+        log.debug("Created {} at location {}", greeting, location);
+        return ResponseEntity.created(location).body(greeting);
+    }
 
+    private Greeting createAndStoreGreeting(Person person) {
         Long id = greetingCounter.incrementAndGet();
+        String message = greetingService.greetName(person.getName());
         Greeting greeting = new Greeting(id, message);
         idToGreeting.put(greeting.getId(), greeting);
+        return greeting;
+    }
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().pathSegment("{id}").buildAndExpand(greeting.getId()).toUri();
-        log.debug("Created {} at location {}", greeting, location);
-
-        return ResponseEntity.created(location).body(greeting);
+    private URI createLocation(Greeting greeting) {
+        return ServletUriComponentsBuilder.fromCurrentRequestUri()
+                .pathSegment("{id}").buildAndExpand(greeting.getId())
+                .toUri();
     }
 
     @GetMapping(path = "/{id}", produces = APPLICATION_JSON_UTF8_VALUE)

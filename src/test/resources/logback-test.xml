@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%date{HH:mm:ss}] %-28.-28logger{0}  %.-1level   %message%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.apache.http" level="DEBUG" />
+
+    <logger name="org.eclipse.jetty" level="ERROR" />
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>

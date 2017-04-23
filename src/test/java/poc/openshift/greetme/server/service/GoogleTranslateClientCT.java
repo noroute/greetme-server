@@ -20,7 +20,6 @@ public class GoogleTranslateClientCT {
 
     @Test
     public void translates_from_English_to_French() throws Exception {
-
         // given
         final String translateUrl = "/translate_a/single?client=gtx&sl=en&tl=fr&dt=t&q=Hello";
         givenThat(get(translateUrl)

@@ -5,6 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import poc.openshift.greetme.server.util.Preconditions;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -13,7 +14,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 @Component
 @Slf4j
@@ -44,9 +44,9 @@ public class GoogleTranslateClient {
     }
 
     public String translate(String text, Locale source, Locale target) {
-        Objects.requireNonNull(text, "text");
-        Objects.requireNonNull(source, "source");
-        Objects.requireNonNull(target, "target");
+        Preconditions.checkNotEmpty(text, "text");
+        Preconditions.checkNotNull(source, "source");
+        Preconditions.checkNotNull(target, "target");
 
         URI url = createUrl(text, source, target);
         RequestEntity<Void> requestEntity = RequestEntity.get(url).header(HttpHeaders.USER_AGENT, "unknown").build();

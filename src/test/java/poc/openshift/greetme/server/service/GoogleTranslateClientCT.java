@@ -19,20 +19,20 @@ public class GoogleTranslateClientCT {
     private GoogleTranslateClient googleTranslateClient = new GoogleTranslateClient("http://localhost:8080");
 
     @Test
-    public void translates_from_English_to_French() throws Exception {
+    public void translates_from_German_to_English() throws Exception {
         // given
-        final String translateUrl = "/translate_a/single?client=gtx&sl=en&tl=fr&dt=t&q=Hello";
+        final String translateUrl = "/translate_a/single?client=gtx&sl=de&tl=en&dt=t&q=Das+K%C3%BCken"; // Das Küken
         givenThat(get(translateUrl)
                 .withHeader(HttpHeaders.USER_AGENT, equalTo("unknown"))
                 .willReturn(aResponse()
                         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .withBody("[[[\"Bonjour\",\"Hello\",null,null,0]],null,\"de\"]")));
+                        .withBody("[[[\"The chick\",\"Das Küken\",null,null,0]],null,\"de\"]")));
 
         // when
-        String translatedText = googleTranslateClient.translate("Hello", Locale.ENGLISH, Locale.FRENCH);
+        String translatedText = googleTranslateClient.translate("Das Küken", Locale.GERMAN, Locale.ENGLISH);
 
         // then
         verify(getRequestedFor(urlEqualTo(translateUrl)));
-        assertThat(translatedText).isEqualTo("Bonjour");
+        assertThat(translatedText).isEqualTo("The chick");
     }
 }

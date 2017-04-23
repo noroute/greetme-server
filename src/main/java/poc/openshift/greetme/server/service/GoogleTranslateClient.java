@@ -6,8 +6,11 @@ import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -16,7 +19,18 @@ import java.util.Objects;
 @Slf4j
 public class GoogleTranslateClient {
 
-    private static final String TRANSLATE_URL_TEMPLATE = "%s/translate_a/single?client=gtx&sl=%s&tl=%s&dt=t&q=%s";
+    private static final String BASE_URL_TEMPLATE = "%s";
+    private static final String SOURCE_LANGUAGE_TEMPLATE = "%s";
+    private static final String TARGET_LANGUAGE_TEMPLATE = "%s";
+    private static final String TEXT_TO_TRANSLATE_TEMPLATE = "%s";
+
+    private static final String TRANSLATE_URL_TEMPLATE = BASE_URL_TEMPLATE +
+            "/translate_a/single" +
+            "?client=gtx" +
+            "&sl=" + SOURCE_LANGUAGE_TEMPLATE +
+            "&tl=" + TARGET_LANGUAGE_TEMPLATE +
+            "&dt=t" +
+            "&q=" + TEXT_TO_TRANSLATE_TEMPLATE;
 
     private RestTemplate client = new RestTemplate();
     private String translateBaseUrl = "https://translate.googleapis.com";
@@ -42,12 +56,24 @@ public class GoogleTranslateClient {
     }
 
     private URI createUrl(String text, Locale source, Locale target) {
-        String urlString = String.format(TRANSLATE_URL_TEMPLATE, translateBaseUrl, source.getLanguage(), target.getLanguage(), text);
+        String urlString = String.format(TRANSLATE_URL_TEMPLATE, translateBaseUrl, source.getLanguage(), target.getLanguage(), encodeText(text));
         try {
             return new URI(urlString);
         }
         catch (URISyntaxException e) {
             String msg = "Google Translate URL " + urlString + " could not be parsed";
+            log.error(msg, e);
+            throw new RuntimeException(msg, e);
+        }
+    }
+
+    private String encodeText(String text) {
+        final String encodingScheme = StandardCharsets.UTF_8.name();
+        try {
+            return URLEncoder.encode(text, encodingScheme);
+        }
+        catch (UnsupportedEncodingException e) {
+            String msg = "Could not URL-encode text " + text + " using " + encodingScheme;
             log.error(msg, e);
             throw new RuntimeException(msg, e);
         }

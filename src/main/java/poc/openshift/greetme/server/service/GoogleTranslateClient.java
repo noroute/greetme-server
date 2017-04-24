@@ -13,7 +13,6 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Locale;
 
 @Component
 @Slf4j
@@ -43,20 +42,20 @@ public class GoogleTranslateClient {
         translateBaseUrl = googleTranslateBaseUrl;
     }
 
-    public String translate(String text, Locale source, Locale target) {
+    public String translate(String text, String sourceLanguage, String targetLanguage) {
         Preconditions.checkNotEmpty(text, "text");
-        Preconditions.checkNotNull(source, "source");
-        Preconditions.checkNotNull(target, "target");
+        Preconditions.checkLanguage(sourceLanguage, "sourceLanguage");
+        Preconditions.checkLanguage(targetLanguage, "targetLanguage");
 
-        URI url = createUrl(text, source, target);
+        URI url = createUrl(text, sourceLanguage, targetLanguage);
         RequestEntity<Void> requestEntity = RequestEntity.get(url).header(HttpHeaders.USER_AGENT, "unknown").build();
         List responseBody = client.exchange(requestEntity, List.class).getBody();
         String translatedText = (String) ((List) ((List) responseBody.get(0)).get(0)).get(0);
         return translatedText;
     }
 
-    private URI createUrl(String text, Locale source, Locale target) {
-        String urlString = String.format(TRANSLATE_URL_TEMPLATE, translateBaseUrl, source.getLanguage(), target.getLanguage(), encodeText(text));
+    private URI createUrl(String text, String sourceLanguage, String targetLanguage) {
+        String urlString = String.format(TRANSLATE_URL_TEMPLATE, translateBaseUrl, sourceLanguage, targetLanguage, encodeText(text));
         try {
             return new URI(urlString);
         }

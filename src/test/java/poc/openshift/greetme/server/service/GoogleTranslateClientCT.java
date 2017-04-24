@@ -29,7 +29,7 @@ public class GoogleTranslateClientCT {
                         .withBody("[[[\"The chick\",\"Das Küken\",null,null,0]],null,\"de\"]")));
 
         // when
-        String translatedText = googleTranslateClient.translate("Das Küken", Locale.GERMAN, Locale.ENGLISH);
+        String translatedText = googleTranslateClient.translate("Das Küken", Locale.GERMAN.getLanguage(), Locale.ENGLISH.getLanguage());
 
         // then
         verify(getRequestedFor(urlEqualTo(translateUrl)));

@@ -2,6 +2,8 @@ package poc.openshift.greetme.server.util;
 
 import org.junit.Test;
 
+import java.util.Locale;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.Assert.fail;
 
@@ -97,5 +99,51 @@ public class PreconditionsTest {
             return;
         }
         fail("expected IllegalArgumentException with message \"stringWithSpaces may not be empty\"");
+    }
+
+    @Test
+    public void checkLanguage_returns_language_code_when_it_is_valid() throws Exception {
+        // given
+        String validLanguageCode = Locale.ENGLISH.getLanguage();
+
+        // when
+        String returnedReference = Preconditions.checkLanguage(validLanguageCode, "validLanguageCode");
+
+        // then
+        assertThat(returnedReference).isSameAs(validLanguageCode);
+    }
+
+    @Test
+    public void checkLanguage_throws_IllegalArgumentException_when_language_code_is_empty() throws Exception {
+        // given
+        String emptyLanguageCode = "";
+
+        // when
+        try {
+            Preconditions.checkLanguage(emptyLanguageCode, "emptyLanguageCode");
+        }
+        // then
+        catch (IllegalArgumentException e) {
+            assertThat(e.getMessage()).isEqualTo("emptyLanguageCode may not be empty");
+            return;
+        }
+        fail("expected IllegalArgumentException with message \"emptyLanguageCode may not be empty\"");
+    }
+
+    @Test
+    public void checkLanguage_throws_IllegalArgumentException_when_language_code_is_invalid() throws Exception {
+        // given
+        String invalidLanguageCode = "12";
+
+        // when
+        try {
+            Preconditions.checkLanguage(invalidLanguageCode, "invalidLanguageCode");
+        }
+        // then
+        catch (IllegalArgumentException e) {
+            assertThat(e.getMessage()).isEqualTo("invalidLanguageCode 12 must be one returned by Locale.getISOLanguages()");
+            return;
+        }
+        fail("expected IllegalArgumentException with message \"invalidLanguageCode 12 must be one returned by Locale.getISOLanguages()\"");
     }
 }

@@ -2,6 +2,9 @@ package poc.openshift.greetme.server.util;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Arrays;
+import java.util.Locale;
+
 @Slf4j
 public class Preconditions {
 
@@ -27,5 +30,16 @@ public class Preconditions {
             throw iae;
         }
         return s;
+    }
+
+    public static String checkLanguage(String isoLanguageCode, String referenceName) {
+        checkNotEmpty(isoLanguageCode, referenceName);
+        if (!Arrays.asList(Locale.getISOLanguages()).contains(isoLanguageCode)) {
+            String msg = referenceName + " " + isoLanguageCode + " must be one returned by Locale.getISOLanguages()";
+            RuntimeException iae = new IllegalArgumentException(msg);
+            log.error(msg, iae);
+            throw iae;
+        }
+        return isoLanguageCode;
     }
 }

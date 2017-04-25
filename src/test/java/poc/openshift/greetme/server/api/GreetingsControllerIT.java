@@ -1,7 +1,9 @@
 package poc.openshift.greetme.server.api;
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,13 +15,18 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Locale;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.http.HttpStatus.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GreetingsControllerIT {
+
+    private static final String ENGLISH = Locale.ENGLISH.getLanguage();
+    private static final String FRENCH = Locale.FRENCH.getLanguage();
 
     @Autowired
     private TestRestTemplate client;
@@ -28,9 +35,9 @@ public class GreetingsControllerIT {
     private int port;
 
     @Test
-    public void creates_greeting_for_posted_person() throws Exception {
+    public void creates_english_greeting_for_posted_person() throws Exception {
         // when
-        ResponseEntity<Greeting> response = postPersonToGreet("Luke");
+        ResponseEntity<Greeting> response = postPersonToGreetInEnglish("Luke");
 
         // then
         long expectedGreetingId = 1;
@@ -40,9 +47,21 @@ public class GreetingsControllerIT {
     }
 
     @Test
+    public void creates_french_greeting_for_posted_person() throws Exception {
+        // when
+        ResponseEntity<Greeting> response = postPersonToGreetInLanguage("Leia", FRENCH);
+
+        // then
+        long expectedGreetingId = 2;
+        assertThat(response.getStatusCode()).isEqualTo(CREATED);
+        assertThat(response.getHeaders().getLocation()).isEqualTo(new URI("http://localhost:" + port + "/greetings/" + expectedGreetingId));
+        assertThat(response.getBody()).isEqualTo(new Greeting(expectedGreetingId, "Bonjour, Leia!"));
+    }
+
+    @Test
     public void gets_greeting_of_id() throws Exception {
         // given
-        ResponseEntity<Greeting> responseForPost = postPersonToGreet("Obi Wan");
+        ResponseEntity<Greeting> responseForPost = postPersonToGreetInEnglish("Obi Wan");
         URI location = responseForPost.getHeaders().getLocation();
 
         // when
@@ -56,7 +75,7 @@ public class GreetingsControllerIT {
     @Test
     public void gets_all_greetings() throws Exception {
         // given
-        Greeting greeting = postPersonToGreet("Qui-Gon Jinn").getBody();
+        Greeting greeting = postPersonToGreetInEnglish("Qui-Gon Jinn").getBody();
 
         // when
         ResponseEntity<Collection<Greeting>> response = client.exchange("/greetings", HttpMethod.GET, null, new ParameterizedTypeReference<Collection<Greeting>>() {
@@ -80,9 +99,14 @@ public class GreetingsControllerIT {
         assertThat(response.getBody()).isNull();
     }
 
-    private ResponseEntity<Greeting> postPersonToGreet(String personName) {
+    private ResponseEntity<Greeting> postPersonToGreetInEnglish(String personName) {
+        return postPersonToGreetInLanguage(personName, ENGLISH);
+    }
+
+    private ResponseEntity<Greeting> postPersonToGreetInLanguage(String personName, String nativeLanguageCode) {
         Person person = new Person();
         person.setName(personName);
+        person.setNativeLanguageCode(nativeLanguageCode);
         return client.postForEntity("/greetings", person, Greeting.class);
     }
 }

@@ -41,7 +41,7 @@ public class GreetingsController {
 
     private Greeting createAndStoreGreeting(Person person) {
         Long id = greetingCounter.incrementAndGet();
-        String message = greetingService.sayHelloTo(person.getName());
+        String message = greetingService.sayHelloTo(person.getName(), person.getNativeLanguageCode());
         Greeting greeting = new Greeting(id, message);
         idToGreeting.put(greeting.getId(), greeting);
         return greeting;

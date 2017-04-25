@@ -51,13 +51,16 @@ public class GoogleTranslateClient {
         RequestEntity<Void> requestEntity = RequestEntity.get(url).header(HttpHeaders.USER_AGENT, "unknown").build();
         List responseBody = client.exchange(requestEntity, List.class).getBody();
         String translatedText = (String) ((List) ((List) responseBody.get(0)).get(0)).get(0);
+        log.info("Translated \"{}\" (language code: {}) to \"{}\" (language code: {})", text, sourceLanguage, translatedText, targetLanguage);
         return translatedText;
     }
 
     private URI createUrl(String text, String sourceLanguage, String targetLanguage) {
         String urlString = String.format(TRANSLATE_URL_TEMPLATE, translateBaseUrl, sourceLanguage, targetLanguage, encodeText(text));
         try {
-            return new URI(urlString);
+            URI uri = new URI(urlString);
+            log.debug("Google Translate URL: {}", uri);
+            return uri;
         }
         catch (URISyntaxException e) {
             String msg = "Google Translate URL " + urlString + " could not be parsed";

@@ -22,7 +22,7 @@ public class PreconditionsTest {
     }
 
     @Test
-    public void checkNotNull_throws_NullPointerException_when_reference_is_null() throws Exception {
+    public void checkNotNull_throws_PreconditionNotFulfilledException_when_reference_is_null() throws Exception {
         // given
         Object nullReference = null;
 
@@ -31,11 +31,11 @@ public class PreconditionsTest {
             Preconditions.checkNotNull(nullReference, "nullReference");
         }
         // then
-        catch (NullPointerException e) {
+        catch (PreconditionNotFulfilledException e) {
             assertThat(e.getMessage()).isEqualTo("nullReference may not be null");
             return;
         }
-        fail("expected NullPointerException with message \"nullReference may not be null\"");
+        fail("expected PreconditionNotFulfilledException with message \"nullReference may not be null\"");
     }
 
     @Test
@@ -51,7 +51,7 @@ public class PreconditionsTest {
     }
 
     @Test
-    public void checkNotEmpty_throws_NullPointerException_when_string_is_null() throws Exception {
+    public void checkNotEmpty_throws_PreconditionNotFulfilledException_when_string_is_null() throws Exception {
         // given
         String nullString = null;
 
@@ -60,15 +60,15 @@ public class PreconditionsTest {
             Preconditions.checkNotEmpty(nullString, "nullString");
         }
         // then
-        catch (NullPointerException e) {
+        catch (PreconditionNotFulfilledException e) {
             assertThat(e.getMessage()).isEqualTo("nullString may not be null");
             return;
         }
-        fail("expected NullPointerException with message \"nullString may not be null\"");
+        fail("expected PreconditionNotFulfilledException with message \"nullString may not be null\"");
     }
 
     @Test
-    public void checkNotEmpty_throws_IllegalArgumentException_when_string_is_empty() throws Exception {
+    public void checkNotEmpty_throws_PreconditionNotFulfilledException_when_string_is_empty() throws Exception {
         // given
         String emptyString = "";
 
@@ -77,15 +77,15 @@ public class PreconditionsTest {
             Preconditions.checkNotEmpty(emptyString, "emptyString");
         }
         // then
-        catch (IllegalArgumentException e) {
+        catch (PreconditionNotFulfilledException e) {
             assertThat(e.getMessage()).isEqualTo("emptyString may not be empty");
             return;
         }
-        fail("expected IllegalArgumentException with message \"emptyString may not be empty\"");
+        fail("expected PreconditionNotFulfilledException with message \"emptyString may not be empty\"");
     }
 
     @Test
-    public void checkNotEmpty_throws_IllegalArgumentException_when_string_is_empty_after_whitespace_has_been_trimmed() throws Exception {
+    public void checkNotEmpty_throws_PreconditionNotFulfilledException_when_string_is_empty_after_whitespace_has_been_trimmed() throws Exception {
         // given
         String stringWithSpaces = "  ";
 
@@ -94,11 +94,11 @@ public class PreconditionsTest {
             Preconditions.checkNotEmpty(stringWithSpaces, "stringWithSpaces");
         }
         // then
-        catch (IllegalArgumentException e) {
+        catch (PreconditionNotFulfilledException e) {
             assertThat(e.getMessage()).isEqualTo("stringWithSpaces may not be empty");
             return;
         }
-        fail("expected IllegalArgumentException with message \"stringWithSpaces may not be empty\"");
+        fail("expected PreconditionNotFulfilledException with message \"stringWithSpaces may not be empty\"");
     }
 
     @Test
@@ -114,7 +114,7 @@ public class PreconditionsTest {
     }
 
     @Test
-    public void checkLanguage_throws_IllegalArgumentException_when_language_code_is_empty() throws Exception {
+    public void checkLanguage_throws_PreconditionNotFulfilledException_when_language_code_is_empty() throws Exception {
         // given
         String emptyLanguageCode = "";
 
@@ -123,15 +123,15 @@ public class PreconditionsTest {
             Preconditions.checkLanguage(emptyLanguageCode, "emptyLanguageCode");
         }
         // then
-        catch (IllegalArgumentException e) {
+        catch (PreconditionNotFulfilledException e) {
             assertThat(e.getMessage()).isEqualTo("emptyLanguageCode may not be empty");
             return;
         }
-        fail("expected IllegalArgumentException with message \"emptyLanguageCode may not be empty\"");
+        fail("expected PreconditionNotFulfilledException with message \"emptyLanguageCode may not be empty\"");
     }
 
     @Test
-    public void checkLanguage_throws_IllegalArgumentException_when_language_code_is_invalid() throws Exception {
+    public void checkLanguage_throws_PreconditionNotFulfilledException_when_language_code_is_invalid() throws Exception {
         // given
         String invalidLanguageCode = "12";
 
@@ -140,10 +140,10 @@ public class PreconditionsTest {
             Preconditions.checkLanguage(invalidLanguageCode, "invalidLanguageCode");
         }
         // then
-        catch (IllegalArgumentException e) {
+        catch (PreconditionNotFulfilledException e) {
             assertThat(e.getMessage()).isEqualTo("invalidLanguageCode 12 must be one returned by Locale.getISOLanguages()");
             return;
         }
-        fail("expected IllegalArgumentException with message \"invalidLanguageCode 12 must be one returned by Locale.getISOLanguages()\"");
+        fail("expected PreconditionNotFulfilledException with message \"invalidLanguageCode 12 must be one returned by Locale.getISOLanguages()\"");
     }
 }

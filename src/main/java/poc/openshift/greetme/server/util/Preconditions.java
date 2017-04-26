@@ -13,10 +13,7 @@ public class Preconditions {
 
     public static <T> T checkNotNull(T reference, String referenceName) {
         if (reference == null) {
-            String msg = referenceName + " may not be null";
-            RuntimeException npe = new NullPointerException(msg);
-            log.error(msg, npe);
-            throw npe;
+            throw createAndLogException(referenceName + " may not be null");
         }
         return reference;
     }
@@ -24,10 +21,7 @@ public class Preconditions {
     public static String checkNotEmpty(String s, String referenceName) {
         checkNotNull(s, referenceName);
         if (s.trim().isEmpty()) {
-            String msg = referenceName + " may not be empty";
-            RuntimeException iae = new IllegalArgumentException(msg);
-            log.error(msg, iae);
-            throw iae;
+            throw createAndLogException(referenceName + " may not be empty");
         }
         return s;
     }
@@ -36,10 +30,14 @@ public class Preconditions {
         checkNotEmpty(isoLanguageCode, referenceName);
         if (!Arrays.asList(Locale.getISOLanguages()).contains(isoLanguageCode)) {
             String msg = referenceName + " " + isoLanguageCode + " must be one returned by Locale.getISOLanguages()";
-            RuntimeException iae = new IllegalArgumentException(msg);
-            log.error(msg, iae);
-            throw iae;
+            throw createAndLogException(msg);
         }
         return isoLanguageCode;
+    }
+
+    private static PreconditionNotFulfilledException createAndLogException(String message) {
+        PreconditionNotFulfilledException exception = new PreconditionNotFulfilledException(message);
+        log.error(message, exception);
+        return exception;
     }
 }

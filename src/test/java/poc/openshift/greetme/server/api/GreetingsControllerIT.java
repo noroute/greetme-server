@@ -35,24 +35,12 @@ public class GreetingsControllerIT {
     private int port;
 
     @Test
-    public void creates_english_greeting_for_posted_person() throws Exception {
-        // when
-        ResponseEntity<Greeting> response = postPersonToGreetInEnglish("Luke");
-
-        // then
-        long expectedGreetingId = 1;
-        assertThat(response.getStatusCode()).isEqualTo(CREATED);
-        assertThat(response.getHeaders().getLocation()).isEqualTo(new URI("http://localhost:" + port + "/greetings/" + expectedGreetingId));
-        assertThat(response.getBody()).isEqualTo(new Greeting(expectedGreetingId, "Hello, Luke!"));
-    }
-
-    @Test
     public void creates_french_greeting_for_posted_person() throws Exception {
         // when
         ResponseEntity<Greeting> response = postPersonToGreetInLanguage("Leia", FRENCH);
 
         // then
-        long expectedGreetingId = 2;
+        long expectedGreetingId = 1;
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
         assertThat(response.getHeaders().getLocation()).isEqualTo(new URI("http://localhost:" + port + "/greetings/" + expectedGreetingId));
         assertThat(response.getBody()).isEqualTo(new Greeting(expectedGreetingId, "Bonjour, Leia!"));

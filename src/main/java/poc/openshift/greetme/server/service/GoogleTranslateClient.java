@@ -66,7 +66,7 @@ public class GoogleTranslateClient {
             return uri;
         }
         catch (URISyntaxException e) {
-            String msg = "Google Translate URL " + urlString + " could not be parsed";
+            String msg = "Google Translate URL '" + urlString + "' could not be parsed";
             log.error(msg, e);
             throw new RuntimeException(msg, e);
         }
@@ -77,7 +77,7 @@ public class GoogleTranslateClient {
             return URLEncoder.encode(text, UTF_8);
         }
         catch (UnsupportedEncodingException e) {
-            String msg = "Could not URL-encode text " + text + " using " + UTF_8;
+            String msg = "Could not URL-encode text '" + text + "' using " + UTF_8;
             log.error(msg, e);
             throw new RuntimeException(msg, e);
         }

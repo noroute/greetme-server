@@ -30,7 +30,7 @@ public class GreetingService {
         return String.format(GREETING_TEMPLATE, hello, name);
     }
 
-    private String translateHello(String languageCode) {
-        return googleTranslateClient.translate("Hello", Locale.ENGLISH.getLanguage(), languageCode);
+    private String translateHello(String isoLanguageCode) {
+        return googleTranslateClient.translate("Hello", ENGLISH, isoLanguageCode);
     }
 }

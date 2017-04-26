@@ -33,7 +33,7 @@ public class GoogleTranslateClientTest {
         configureRestTemplateStub();
 
         // when
-        googleTranslateClient.translate("someText", "someSourceLanguage", "someTargetLanguage");
+        googleTranslateClient.translate("someText", "someSourceLanguageCode", "someTargetLanguageCode");
 
         // then
         verifyStatic();
@@ -41,11 +41,11 @@ public class GoogleTranslateClientTest {
 
         // and
         verifyStatic();
-        Preconditions.checkLanguage(eq("someSourceLanguage"), anyString());
+        Preconditions.checkLanguage(eq("someSourceLanguageCode"), anyString());
 
         // and
         verifyStatic();
-        Preconditions.checkLanguage(eq("someTargetLanguage"), anyString());
+        Preconditions.checkLanguage(eq("someTargetLanguageCode"), anyString());
     }
 
     private void configureRestTemplateStub() {

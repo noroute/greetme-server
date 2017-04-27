@@ -19,17 +19,17 @@ public class RestControllerExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorObject<String> handleThrowable(Throwable throwable) {
         String errorDetails = throwable.getMessage();
-        return createAndLogError("Internal server error", errorDetails, throwable);
+        return createAndLogErrorObject("Internal server error", errorDetails, throwable);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorObject handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
         List<String> errorDetails = createMessagesTellingWhichFieldsFailedHowTheirValidation(exception);
-        return createAndLogError("Validation failed", errorDetails, exception);
+        return createAndLogErrorObject("Validation failed", errorDetails, exception);
     }
 
-    private <T> ErrorObject<T> createAndLogError(String errorMessage, T errorDetails, Throwable throwable) {
+    private <T> ErrorObject<T> createAndLogErrorObject(String errorMessage, T errorDetails, Throwable throwable) {
         ErrorObject<T> errorObject = new ErrorObject<>(errorMessage, errorDetails);
         log.error("Responding with " + errorObject + ", thrown Exception was:", throwable);
         return errorObject;

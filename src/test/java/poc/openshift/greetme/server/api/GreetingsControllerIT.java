@@ -14,11 +14,12 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import poc.openshift.greetme.server.exception.ErrorObject;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
@@ -31,10 +32,6 @@ public class GreetingsControllerIT {
 
     private static final String ENGLISH = Locale.ENGLISH.getLanguage();
     private static final String FRENCH = Locale.FRENCH.getLanguage();
-
-    private static final String ERROR_MESSAGE_ATTRIBUTE = "error_message";
-    private static final String ERROR_DETAILS_ATTRIBUTE = "error_details";
-    private static final String ERROR_ID_ATTRIBUTE = "error_id";
 
     @Autowired
     private TestRestTemplate client;
@@ -55,24 +52,24 @@ public class GreetingsControllerIT {
     }
 
     @Test
-    public void responds_with_bad_request_when_preconditions_are_not_fulfilled() throws Exception {
+    public void responds_with_bad_request_when_request_data_is_invalid() throws Exception {
         // given
+        Locale.setDefault(Locale.US); // allows us to check the Bean Validation constraint violations in English
         Person personWithoutNameAndNativeLanguage = new Person();
 
         // when
-        RequestEntity<Person> postInvalidPersonToSlashGreetingsRequest = new RequestEntity<>(personWithoutNameAndNativeLanguage, HttpMethod.POST, new URI("/greetings"));
-        ResponseEntity<Map<String, String>> response = client.exchange(postInvalidPersonToSlashGreetingsRequest, new ParameterizedTypeReference<Map<String, String>>() {
+        RequestEntity<Person> requestEntity = new RequestEntity<>(personWithoutNameAndNativeLanguage, HttpMethod.POST, new URI("/greetings"));
+        ResponseEntity<ErrorObject<List<String>>> response = client.exchange(requestEntity, new ParameterizedTypeReference<ErrorObject<List<String>>>() {
         });
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
 
         // and
-        Map<String, String> responseBody = response.getBody();
-        assertThat(responseBody).containsKeys(ERROR_MESSAGE_ATTRIBUTE, ERROR_DETAILS_ATTRIBUTE, ERROR_ID_ATTRIBUTE);
-        assertThat(responseBody.get(ERROR_MESSAGE_ATTRIBUTE)).isEqualTo("Precondition not fulfilled");
-        assertThat(responseBody.get(ERROR_DETAILS_ATTRIBUTE)).isEqualTo("name may not be null");
-        assertThat(responseBody.get(ERROR_ID_ATTRIBUTE)).is(uuid());
+        ErrorObject<List<String>> errorObject = response.getBody();
+        assertThat(errorObject.getErrorMessage()).isEqualTo("Validation failed");
+        assertThat(errorObject.getErrorDetails()).contains("name may not be empty", "nativeLanguageCode must be an ISO 639 language code");
+        assertThat(errorObject.getErrorId()).is(uuid());
     }
 
     private Condition<String> uuid() {

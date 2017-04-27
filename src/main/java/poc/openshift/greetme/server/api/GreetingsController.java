@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import poc.openshift.greetme.server.service.GreetingService;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,7 +33,7 @@ public class GreetingsController {
     }
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Greeting> postPersonToGreet(@RequestBody Person person) {
+    public ResponseEntity<Greeting> postPersonToGreet(@Valid @RequestBody Person person) {
         Greeting greeting = createAndStoreGreeting(person);
         URI location = createLocation(greeting);
         log.info("Created {} at location {}", greeting, location);

@@ -2,7 +2,6 @@ package poc.openshift.greetme.server.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import poc.openshift.greetme.server.util.Preconditions;
 
 import java.util.Locale;
 
@@ -23,9 +22,6 @@ public class GreetingService {
     }
 
     public String sayHelloTo(String name, String isoLanguageCode) {
-        Preconditions.checkNotEmpty(name, "name");
-        Preconditions.checkLanguage(isoLanguageCode, "isoLanguageCode");
-
         String hello = isoLanguageCode.equals(ENGLISH) ? "Hello" : translateHello(isoLanguageCode);
         return String.format(GREETING_TEMPLATE, hello, name);
     }

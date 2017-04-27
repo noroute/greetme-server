@@ -16,9 +16,6 @@ import java.util.UUID;
 @Slf4j
 public class RestControllerExceptionHandler {
 
-    private static final String ERROR_MESSAGE_ATTRIBUTE = "error_message";
-    private static final String ERROR_ID_ATTRIBUTE = "error_id";
-
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleThrowable(Throwable throwable) {
@@ -34,9 +31,10 @@ public class RestControllerExceptionHandler {
     private Map<String, String> createAndLogErrors(String errorMessage, Throwable throwable) {
         String errorId = UUID.randomUUID().toString();
         Map<String, String> errors = new LinkedHashMap<>();
-        errors.put(ERROR_MESSAGE_ATTRIBUTE, errorMessage);
-        errors.put(ERROR_ID_ATTRIBUTE, errorId);
-        log.error("Responding with " + ERROR_ID_ATTRIBUTE + " '" + errorId + "', caused by:", throwable);
+        errors.put("error_message", errorMessage);
+        errors.put("error_details", throwable.getMessage());
+        errors.put("error_id", errorId);
+        log.error("Responding with error_id '" + errorId + "', caused by:", throwable);
         return errors;
     }
 }

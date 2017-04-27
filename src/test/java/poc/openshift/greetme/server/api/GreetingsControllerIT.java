@@ -33,6 +33,7 @@ public class GreetingsControllerIT {
     private static final String FRENCH = Locale.FRENCH.getLanguage();
 
     private static final String ERROR_MESSAGE_ATTRIBUTE = "error_message";
+    private static final String ERROR_DETAILS_ATTRIBUTE = "error_details";
     private static final String ERROR_ID_ATTRIBUTE = "error_id";
 
     @Autowired
@@ -56,10 +57,10 @@ public class GreetingsControllerIT {
     @Test
     public void responds_with_bad_request_when_preconditions_are_not_fulfilled() throws Exception {
         // given
-        Person invalidPerson = new Person();
+        Person personWithoutNameAndNativeLanguage = new Person();
 
         // when
-        RequestEntity<Person> postInvalidPersonToSlashGreetingsRequest = new RequestEntity<>(invalidPerson, HttpMethod.POST, new URI("/greetings"));
+        RequestEntity<Person> postInvalidPersonToSlashGreetingsRequest = new RequestEntity<>(personWithoutNameAndNativeLanguage, HttpMethod.POST, new URI("/greetings"));
         ResponseEntity<Map<String, String>> response = client.exchange(postInvalidPersonToSlashGreetingsRequest, new ParameterizedTypeReference<Map<String, String>>() {
         });
 
@@ -68,8 +69,9 @@ public class GreetingsControllerIT {
 
         // and
         Map<String, String> responseBody = response.getBody();
-        assertThat(responseBody).containsKeys(ERROR_MESSAGE_ATTRIBUTE, ERROR_ID_ATTRIBUTE);
+        assertThat(responseBody).containsKeys(ERROR_MESSAGE_ATTRIBUTE, ERROR_DETAILS_ATTRIBUTE, ERROR_ID_ATTRIBUTE);
         assertThat(responseBody.get(ERROR_MESSAGE_ATTRIBUTE)).isEqualTo("Precondition not fulfilled");
+        assertThat(responseBody.get(ERROR_DETAILS_ATTRIBUTE)).isEqualTo("name may not be null");
         assertThat(responseBody.get(ERROR_ID_ATTRIBUTE)).is(uuid());
     }
 

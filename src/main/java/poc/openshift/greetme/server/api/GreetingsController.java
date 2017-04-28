@@ -62,14 +62,14 @@ public class GreetingsController {
         }
 
         Greeting greeting = idToGreeting.get(id);
-        log.debug("Respond with {}", greeting);
+        log.info("Respond with {}", greeting);
         return ResponseEntity.ok().body(greeting);
     }
 
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
     public Collection<Greeting> getAllGreetings() {
         Collection<Greeting> greetings = Collections.unmodifiableCollection(idToGreeting.values());
-        log.debug("Respond with all Greetings: {}", greetings);
+        log.info("Respond with all Greetings: {}", greetings);
         return greetings;
     }
 }

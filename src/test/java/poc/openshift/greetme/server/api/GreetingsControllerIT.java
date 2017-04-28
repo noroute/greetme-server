@@ -52,15 +52,13 @@ public class GreetingsControllerIT {
     }
 
     @Test
-    public void responds_with_bad_request_when_request_data_is_invalid() throws Exception {
+    public void responds_with_bad_request_when_posted_person_is_erroneous() throws Exception {
         // given
         Locale.setDefault(Locale.US); // allows us to check the Bean Validation constraint violations in English
         Person personWithoutNameAndNativeLanguage = new Person();
 
         // when
-        RequestEntity<Person> requestEntity = new RequestEntity<>(personWithoutNameAndNativeLanguage, HttpMethod.POST, new URI("/greetings"));
-        ResponseEntity<ErrorObject<List<String>>> response = client.exchange(requestEntity, new ParameterizedTypeReference<ErrorObject<List<String>>>() {
-        });
+        ResponseEntity<ErrorObject<List<String>>> response = postErroneousPerson(personWithoutNameAndNativeLanguage);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
@@ -70,21 +68,6 @@ public class GreetingsControllerIT {
         assertThat(errorObject.getErrorMessage()).isEqualTo("Validation failed");
         assertThat(errorObject.getErrorDetails()).contains("name may not be empty", "nativeLanguageCode must be an ISO 639 language code");
         assertThat(errorObject.getErrorId()).is(uuid());
-    }
-
-    private Condition<String> uuid() {
-        return new Condition<String>() {
-            @Override
-            public boolean matches(String value) {
-                try {
-                    UUID.fromString(value);
-                    return true;
-                }
-                catch (IllegalArgumentException e) {
-                    return false;
-                }
-            }
-        };
     }
 
     @Test
@@ -137,5 +120,26 @@ public class GreetingsControllerIT {
         person.setName(personName);
         person.setNativeLanguageCode(nativeLanguageCode);
         return client.postForEntity("/greetings", person, Greeting.class);
+    }
+
+    private ResponseEntity<ErrorObject<List<String>>> postErroneousPerson(Person erroneousPerson) throws Exception {
+        RequestEntity<Person> requestEntity = new RequestEntity<>(erroneousPerson, HttpMethod.POST, new URI("/greetings"));
+        return client.exchange(requestEntity, new ParameterizedTypeReference<ErrorObject<List<String>>>() {
+        });
+    }
+
+    private Condition<String> uuid() {
+        return new Condition<String>() {
+            @Override
+            public boolean matches(String value) {
+                try {
+                    UUID.fromString(value);
+                    return true;
+                }
+                catch (IllegalArgumentException e) {
+                    return false;
+                }
+            }
+        };
     }
 }

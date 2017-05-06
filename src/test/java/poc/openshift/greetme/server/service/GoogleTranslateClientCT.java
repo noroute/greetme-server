@@ -19,9 +19,9 @@ public class GoogleTranslateClientCT {
     private static final String GERMAN = Locale.GERMAN.getLanguage();
 
     @Rule
-    public WireMockRule wireMockRule = new WireMockRule();
+    public final WireMockRule wireMockRule = new WireMockRule(8085);
 
-    private GoogleTranslateClient googleTranslateClient = new GoogleTranslateClient("http://localhost:8080");
+    private GoogleTranslateClient googleTranslateClient = new GoogleTranslateClient("http://localhost:8085");
 
     @Before
     public void resetWireMock() {

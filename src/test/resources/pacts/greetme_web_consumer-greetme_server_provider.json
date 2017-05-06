@@ -1,0 +1,79 @@
+{
+    "provider": {
+        "name": "greetme_server_provider"
+    },
+    "consumer": {
+        "name": "greetme_web_consumer"
+    },
+    "interactions": [
+        {
+            "description": "GET /greetings returns array containing greeting(s)",
+            "request": {
+                "method": "GET",
+                "path": "/greetings"
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json;charset=utf-8"
+                },
+                "body": [
+                    {
+                        "id": 2,
+                        "message": "Hello, Alice!"
+                    }
+                ],
+                "matchingRules": {
+                    "$.body[*].message": {
+                        "regex": "Hello, Alice!"
+                    },
+                    "$.body": {
+                        "min": 1,
+                        "match": "type"
+                    },
+                    "$.body[*].id": {
+                        "match": "type"
+                    }
+                }
+            },
+            "providerState": "at_least_one_greeting"
+        },
+        {
+            "description": "POST /greetings creates greeting for person",
+            "request": {
+                "method": "POST",
+                "path": "/greetings",
+                "headers": {
+                    "Content-Type": "application/json; charset=UTF-8"
+                },
+                "body": {
+                    "name": "Bob",
+                    "nativeLanguageCode": "en"
+                }
+            },
+            "response": {
+                "status": 201,
+                "headers": {
+                    "Content-Type": "application/json;charset=utf-8"
+                },
+                "body": {
+                    "id": 1,
+                    "message": "Hello, Bob!"
+                },
+                "matchingRules": {
+                    "$.body.id": {
+                        "match": "type"
+                    }
+                }
+            }
+        }
+    ],
+    "metadata": {
+        "pact-specification": {
+            "version": "3.0.0"
+        },
+        "pact-jvm": {
+            "version": "3.3.8"
+        }
+    }
+}

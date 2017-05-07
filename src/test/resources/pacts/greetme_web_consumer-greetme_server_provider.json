@@ -15,7 +15,7 @@
             "response": {
                 "status": 200,
                 "headers": {
-                    "Content-Type": "application/json;charset=utf-8"
+                    "Content-Type": "application/json;charset=UTF-8"
                 },
                 "body": [
                     {
@@ -25,7 +25,7 @@
                 ],
                 "matchingRules": {
                     "$.body[*].message": {
-                        "regex": "Hello, Alice!"
+                        "regex": ".*, .*!"
                     },
                     "$.body": {
                         "min": 1,
@@ -44,7 +44,7 @@
                 "method": "POST",
                 "path": "/greetings",
                 "headers": {
-                    "Content-Type": "application/json; charset=UTF-8"
+                    "Content-Type": "application/json"
                 },
                 "body": {
                     "name": "Bob",
@@ -54,7 +54,7 @@
             "response": {
                 "status": 201,
                 "headers": {
-                    "Content-Type": "application/json;charset=utf-8"
+                    "Content-Type": "application/json;charset=UTF-8"
                 },
                 "body": {
                     "id": 1,

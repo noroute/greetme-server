@@ -1,12 +1,13 @@
 package poc.openshift.greetme.server.api;
 
 import org.assertj.core.api.Condition;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
@@ -26,18 +27,22 @@ import static org.assertj.core.api.Assertions.*;
 import static org.springframework.http.HttpStatus.*;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GreetingsControllerIT {
 
+    private static final Locale DEFAULT_LOCALE = Locale.getDefault();
     private static final String ENGLISH = Locale.ENGLISH.getLanguage();
     private static final String FRENCH = Locale.FRENCH.getLanguage();
 
     @Autowired
     private TestRestTemplate client;
 
-    @LocalServerPort
-    private int port;
+    @BeforeClass
+    public static void setDefaultLocaleUS() {
+        // allows us to check the Bean Validation constraint violations in English
+        Locale.setDefault(Locale.US);
+    }
 
     @Test
     public void creates_french_greeting_for_posted_person() throws Exception {
@@ -47,14 +52,13 @@ public class GreetingsControllerIT {
         // then
         long expectedGreetingId = 1;
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
-        assertThat(response.getHeaders().getLocation()).isEqualTo(new URI("http://localhost:" + port + "/greetings/" + expectedGreetingId));
+        assertThat(response.getHeaders().getLocation()).isEqualTo(new URI("http://localhost:8080/greetings/" + expectedGreetingId));
         assertThat(response.getBody()).isEqualTo(new Greeting(expectedGreetingId, "Bonjour, Leia!"));
     }
 
     @Test
     public void responds_with_bad_request_when_posted_person_is_erroneous() throws Exception {
         // given
-        Locale.setDefault(Locale.US); // allows us to check the Bean Validation constraint violations in English
         Person personWithoutNameAndNativeLanguage = new Person();
 
         // when
@@ -109,6 +113,11 @@ public class GreetingsControllerIT {
         // then
         assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
         assertThat(response.getBody()).isNull();
+    }
+
+    @AfterClass
+    public static void restoreDefaultLocale() {
+        Locale.setDefault(DEFAULT_LOCALE);
     }
 
     private ResponseEntity<Greeting> postPersonToGreetInEnglish(String personName) {

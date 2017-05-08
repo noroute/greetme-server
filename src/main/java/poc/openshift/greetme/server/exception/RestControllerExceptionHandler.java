@@ -2,6 +2,7 @@ package poc.openshift.greetme.server.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -15,18 +16,27 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RestControllerExceptionHandler {
 
-    @ExceptionHandler(Throwable.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorObject<String> handleThrowable(Throwable throwable) {
-        String errorDetails = throwable.getMessage();
-        return createAndLogErrorObject("Internal server error", errorDetails, throwable);
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorObject<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
+        return createAndLogErrorObject("Invalid JSON body", exception);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorObject handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+    public ErrorObject<List<String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
         List<String> errorDetails = createMessagesTellingWhichFieldsFailedHowTheirValidation(exception);
         return createAndLogErrorObject("Validation failed", errorDetails, exception);
+    }
+
+    @ExceptionHandler(Throwable.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorObject<String> handleThrowable(Throwable throwable) {
+        return createAndLogErrorObject("Internal server error", throwable);
+    }
+
+    private ErrorObject<String> createAndLogErrorObject(String errorMessage, Throwable throwable) {
+        return createAndLogErrorObject(errorMessage, throwable.getMessage(), throwable);
     }
 
     private <T> ErrorObject<T> createAndLogErrorObject(String errorMessage, T errorDetails, Throwable throwable) {

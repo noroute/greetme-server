@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import poc.openshift.greetme.server.exception.ErrorObject;
 
 import java.net.URI;
@@ -30,6 +30,8 @@ import static org.springframework.http.HttpStatus.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GreetingsControllerIT {
+
+    private static final String GREETINGS_RESOURCE_URL = "/greetings";
 
     private static final Locale DEFAULT_LOCALE = Locale.getDefault();
     private static final String ENGLISH = Locale.ENGLISH.getLanguage();
@@ -52,12 +54,27 @@ public class GreetingsControllerIT {
         // then
         long expectedGreetingId = 1;
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
-        assertThat(response.getHeaders().getLocation()).isEqualTo(new URI("http://localhost:8080/greetings/" + expectedGreetingId));
+        assertThat(response.getHeaders().getLocation()).isEqualTo(new URI("http://localhost:8080" + GREETINGS_RESOURCE_URL + "/" + expectedGreetingId));
         assertThat(response.getBody()).isEqualTo(new Greeting(expectedGreetingId, "Bonjour, Leia!"));
     }
 
     @Test
-    public void responds_with_bad_request_when_posted_person_is_erroneous() throws Exception {
+    public void responds_with_bad_request_when_invalid_data_is_posted() throws Exception {
+        // when
+        ResponseEntity<ErrorObject<String>> response = postInvalidData();
+
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
+
+        // and
+        ErrorObject<String> errorObject = response.getBody();
+        assertThat(errorObject.getErrorMessage()).isEqualTo("Invalid JSON body");
+        assertThat(errorObject.getErrorDetails()).startsWith("Required request body is missing");
+        assertThat(errorObject.getErrorId()).is(uuid());
+    }
+
+    @Test
+    public void responds_with_bad_request_when_erroneous_person_is_posted() throws Exception {
         // given
         Person personWithoutNameAndNativeLanguage = new Person();
 
@@ -91,7 +108,7 @@ public class GreetingsControllerIT {
     @Test
     public void responds_with_not_found_when_non_existent_greeting_is_requested() throws Exception {
         // given
-        String urlOfNonExistentGreeting = "/greetings/9999";
+        String urlOfNonExistentGreeting = GREETINGS_RESOURCE_URL + "/9999";
 
         // when
         ResponseEntity<String> response = client.getForEntity(urlOfNonExistentGreeting, String.class);
@@ -107,7 +124,7 @@ public class GreetingsControllerIT {
         Greeting greeting = postPersonToGreetInEnglish("Qui-Gon Jinn").getBody();
 
         // when
-        ResponseEntity<Collection<Greeting>> response = client.exchange("/greetings", HttpMethod.GET, null, new ParameterizedTypeReference<Collection<Greeting>>() {
+        ResponseEntity<Collection<Greeting>> response = client.exchange(GREETINGS_RESOURCE_URL, HttpMethod.GET, null, new ParameterizedTypeReference<Collection<Greeting>>() {
         });
 
         // then
@@ -128,11 +145,20 @@ public class GreetingsControllerIT {
         Person person = new Person();
         person.setName(personName);
         person.setNativeLanguageCode(nativeLanguageCode);
-        return client.postForEntity("/greetings", person, Greeting.class);
+        return client.postForEntity(GREETINGS_RESOURCE_URL, person, Greeting.class);
+    }
+
+    private ResponseEntity<ErrorObject<String>> postInvalidData() throws Exception {
+        Object invalidData = null;
+        MultiValueMap<String, String> contentTypeIsApplicationJsonHeader = new LinkedMultiValueMap<>();
+        contentTypeIsApplicationJsonHeader.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        RequestEntity<?> requestEntity = new RequestEntity<>(invalidData, contentTypeIsApplicationJsonHeader, HttpMethod.POST, new URI(GREETINGS_RESOURCE_URL));
+        return client.exchange(requestEntity, new ParameterizedTypeReference<ErrorObject<String>>() {
+        });
     }
 
     private ResponseEntity<ErrorObject<List<String>>> postErroneousPerson(Person erroneousPerson) throws Exception {
-        RequestEntity<Person> requestEntity = new RequestEntity<>(erroneousPerson, HttpMethod.POST, new URI("/greetings"));
+        RequestEntity<Person> requestEntity = new RequestEntity<>(erroneousPerson, HttpMethod.POST, new URI(GREETINGS_RESOURCE_URL));
         return client.exchange(requestEntity, new ParameterizedTypeReference<ErrorObject<List<String>>>() {
         });
     }

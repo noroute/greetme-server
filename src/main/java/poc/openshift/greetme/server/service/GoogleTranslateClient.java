@@ -1,7 +1,6 @@
 package poc.openshift.greetme.server.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -13,6 +12,9 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
+
+import static java.util.Locale.ENGLISH;
+import static org.springframework.http.HttpHeaders.USER_AGENT;
 
 @Component
 @Slf4j
@@ -46,7 +48,7 @@ public class GoogleTranslateClient {
 
     public String translate(String text, String sourceLanguageCode, String targetLanguageCode) {
         URI url = createUrl(text, sourceLanguageCode, targetLanguageCode);
-        RequestEntity<Void> requestEntity = RequestEntity.get(url).header(HttpHeaders.USER_AGENT, "unknown").build();
+        RequestEntity<Void> requestEntity = RequestEntity.get(url).header(USER_AGENT, "unknown").build();
         List responseBody = client.exchange(requestEntity, List.class).getBody();
         String translatedText = parseResponseBody(responseBody, text, targetLanguageCode);
         log.info("Translated \"{}\" (language code: {}) to \"{}\" (language code: {})", text, sourceLanguageCode, translatedText, targetLanguageCode);
@@ -80,7 +82,7 @@ public class GoogleTranslateClient {
 
     private String parseResponseBody(List responseBody, String text, String targetLanguage) {
         if (isTextNotTranslated(responseBody)) {
-            String language = Locale.forLanguageTag(targetLanguage).getDisplayLanguage(Locale.ENGLISH);
+            String language = Locale.forLanguageTag(targetLanguage).getDisplayLanguage(ENGLISH);
             return "Sorry, could not translate \"" + text + "\" to " + language;
         }
         return (String) ((List) ((List) responseBody.get(0)).get(0)).get(0);

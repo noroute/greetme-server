@@ -7,7 +7,7 @@
     },
     "interactions": [
         {
-            "description": "GET /greetings returns array containing greeting(s)",
+            "description": "GET /greetings responds with array containing greeting(s)",
             "request": {
                 "method": "GET",
                 "path": "/greetings"
@@ -63,6 +63,38 @@
                 "matchingRules": {
                     "$.body.id": {
                         "match": "type"
+                    }
+                }
+            }
+        },
+        {
+            "description": "POST /greetings responds with Bad Request when validation failed",
+            "request": {
+                "method": "POST",
+                "path": "/greetings",
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "name": "Mallory",
+                    "nativeLanguageCode": "invalidLanguageCode"
+                }
+            },
+            "response": {
+                "status": 400,
+                "headers": {
+                    "Content-Type": "application/json;charset=UTF-8"
+                },
+                "body": {
+                    "error_details": [
+                        "nativeLanguageCode must be an ISO 639 language code"
+                    ],
+                    "error_id": "477eff52-2457-4cd4-9cea-5330dcd55513",
+                    "error_message": "Validation failed"
+                },
+                "matchingRules": {
+                    "$.body.error_id": {
+                        "regex": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
                     }
                 }
             }

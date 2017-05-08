@@ -7,14 +7,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Makes sure Spring Boot always uses an embedded Tomcat.
+ * <p>Makes sure Spring Boot always uses an embedded Tomcat.</p>
  *
- * Without this configuration Jetty will be used because WireMock depends on it and such the Jetty JARs will
- * come first in the classpath and Spring Boot auto configures that.
+ * <p>Without this configuration Jetty will be used because this project uses WireMock, which depends on Jetty.
+ * (The Jetty JARs will be first in the classpath causing Spring Boot to auto configure Jetty as server.)</p>
  *
- * Using Jetty causes Pact tests to fail as Pact files generated for Tomcat expect an HTTP Content-Type header of
+ * <p>Using Jetty causes Pact tests to fail as Pact files generated for Tomcat expect an HTTP Content-Type header of
  * "application/json;charset=UTF-8" (upper case "UTF") whereas Jetty responds with "application/json;charset=utf-8"
- * (lower case "utf").
+ * (lower case "utf").</p>
  */
 @Configuration
 @AutoConfigureBefore(EmbeddedServletContainerAutoConfiguration.class)

@@ -14,14 +14,15 @@ import static org.assertj.core.api.Assertions.*;
 
 public class GoogleTranslateClientCT {
 
+    private static final int PORT = 8085;
     private static final String DZONGKHA = "dz";
     private static final String ENGLISH = Locale.ENGLISH.getLanguage();
     private static final String GERMAN = Locale.GERMAN.getLanguage();
 
     @Rule
-    public final WireMockRule wireMockRule = new WireMockRule(8085);
+    public final WireMockRule wireMockRule = new WireMockRule(PORT);
 
-    private GoogleTranslateClient googleTranslateClient = new GoogleTranslateClient("http://localhost:8085");
+    private GoogleTranslateClient googleTranslateClient = new GoogleTranslateClient("http://localhost:" + PORT);
 
     @Before
     public void resetWireMock() {

@@ -89,6 +89,19 @@ public class GreetingsControllerIT {
     }
 
     @Test
+    public void responds_with_not_found_when_non_existent_greeting_is_requested() throws Exception {
+        // given
+        String urlOfNonExistentGreeting = "/greetings/9999";
+
+        // when
+        ResponseEntity<String> response = client.getForEntity(urlOfNonExistentGreeting, String.class);
+
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
+        assertThat(response.getBody()).isNull();
+    }
+
+    @Test
     public void gets_all_greetings() throws Exception {
         // given
         Greeting greeting = postPersonToGreetInEnglish("Qui-Gon Jinn").getBody();
@@ -100,19 +113,6 @@ public class GreetingsControllerIT {
         // then
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getBody()).contains(greeting);
-    }
-
-    @Test
-    public void responds_with_not_found_when_non_existent_greeting_is_requested() throws Exception {
-        // given
-        String urlOfNonExistentGreeting = "/greetings/9999";
-
-        // when
-        ResponseEntity<String> response = client.getForEntity(urlOfNonExistentGreeting, String.class);
-
-        // then
-        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
-        assertThat(response.getBody()).isNull();
     }
 
     @AfterClass

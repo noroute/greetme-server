@@ -1,13 +1,14 @@
 package poc.openshift.greetme.server.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -25,7 +26,6 @@ public class GoogleTranslateClient {
     private static final String BASE_URL_TEMPLATE = "%s";
     private static final String SOURCE_LANGUAGE_CODE_TEMPLATE = "%s";
     private static final String TARGET_LANGUAGE_CODE_TEMPLATE = "%s";
-
     private static final String TEXT_TO_TRANSLATE_TEMPLATE = "%s";
     private static final String TRANSLATE_URL_TEMPLATE = BASE_URL_TEMPLATE +
             "/translate_a/single" +
@@ -35,38 +35,28 @@ public class GoogleTranslateClient {
             "&dt=t" +
             "&q=" + TEXT_TO_TRANSLATE_TEMPLATE;
 
-    private RestTemplate client = new RestTemplate();
-    private String translateBaseUrl = "https://translate.googleapis.com";
+    private final String translateBaseUrl;
+    private final RestTemplate client = new RestTemplate();
 
-    public GoogleTranslateClient() {
-    }
-
-    // For tests only
-    GoogleTranslateClient(String googleTranslateBaseUrl) {
+    @Autowired
+    public GoogleTranslateClient(@Value("${google.translate.baseurl}") String googleTranslateBaseUrl) {
         translateBaseUrl = googleTranslateBaseUrl;
     }
 
     public String translate(String text, String sourceLanguageCode, String targetLanguageCode) {
-        URI url = createUrl(text, sourceLanguageCode, targetLanguageCode);
-        RequestEntity<Void> requestEntity = RequestEntity.get(url).header(USER_AGENT, "unknown").build();
-        List responseBody = client.exchange(requestEntity, List.class).getBody();
+        URI translationUrl = createTranslationUrl(text, sourceLanguageCode, targetLanguageCode);
+        RequestEntity<Void> translationRequest = RequestEntity.get(translationUrl).header(USER_AGENT, "unknown").build();
+        List responseBody = client.exchange(translationRequest, List.class).getBody();
         String translatedText = parseResponseBody(responseBody, text, targetLanguageCode);
         log.info("Translated \"{}\" (language code: {}) to \"{}\" (language code: {})", text, sourceLanguageCode, translatedText, targetLanguageCode);
         return translatedText;
     }
 
-    private URI createUrl(String text, String sourceLanguageCode, String targetLanguageCode) {
+    private URI createTranslationUrl(String text, String sourceLanguageCode, String targetLanguageCode) {
         String urlString = String.format(TRANSLATE_URL_TEMPLATE, translateBaseUrl, sourceLanguageCode, targetLanguageCode, encodeText(text));
-        try {
-            URI uri = new URI(urlString);
-            log.debug("Google Translate URL: {}", uri);
-            return uri;
-        }
-        catch (URISyntaxException e) {
-            String msg = "Google Translate URL '" + urlString + "' could not be parsed";
-            log.error(msg, e);
-            throw new RuntimeException(msg, e);
-        }
+        URI uri = URI.create(urlString);
+        log.debug("Google Translate URL: {}", uri);
+        return uri;
     }
 
     private String encodeText(String text) {

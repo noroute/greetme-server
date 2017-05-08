@@ -4,13 +4,14 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 
 import java.util.Locale;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpHeaders.USER_AGENT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 public class GoogleTranslateClientCT {
 
@@ -34,9 +35,9 @@ public class GoogleTranslateClientCT {
         // given
         final String translateUrl = "/translate_a/single?client=gtx&sl=de&tl=en&dt=t&q=Das+K%C3%BCken"; // Das Küken
         givenThat(get(translateUrl)
-                .withHeader(HttpHeaders.USER_AGENT, equalTo("unknown"))
+                .withHeader(USER_AGENT, equalTo("unknown"))
                 .willReturn(aResponse()
-                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
                         .withBody("[[[\"The chick\",\"Das Küken\",null,null,0]],null,\"de\"]")));
 
         // when
@@ -52,9 +53,9 @@ public class GoogleTranslateClientCT {
         // given
         final String translateUrl = "/translate_a/single?client=gtx&sl=en&tl=dz&dt=t&q=Hello";
         givenThat(get(translateUrl)
-                .withHeader(HttpHeaders.USER_AGENT, equalTo("unknown"))
+                .withHeader(USER_AGENT, equalTo("unknown"))
                 .willReturn(aResponse()
-                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE)
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
                         .withBody("[null,null,\"en\"]")));
 
         // when

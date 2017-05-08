@@ -33,14 +33,11 @@ public class GreetingServiceTest {
     }
 
     @Test
-    public void greets_with_bonjour_mallory_if_name_is_mallory_and_language_is_french() throws Exception {
-        // given
-        when(googleTranslateClientMock.translate("Hello", ENGLISH, FRENCH)).thenReturn("Bonjour");
-
+    public void translates_using_Google_when_language_is_non_english() throws Exception {
         // when
-        String message = greetingService.sayHelloTo("Mallory", FRENCH);
+        greetingService.sayHelloTo("Mallory", FRENCH);
 
         // then
-        assertThat(message).isEqualTo("Bonjour, Mallory!");
+        verify(googleTranslateClientMock).translate("Hello", ENGLISH, FRENCH);
     }
 }

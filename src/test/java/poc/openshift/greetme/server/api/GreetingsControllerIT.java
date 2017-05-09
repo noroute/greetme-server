@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import poc.openshift.greetme.server.exception.ErrorObject;
 
 import java.net.URI;
@@ -24,7 +24,9 @@ import java.util.Locale;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -54,7 +56,7 @@ public class GreetingsControllerIT {
         // then
         long expectedGreetingId = 1;
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
-        assertThat(response.getHeaders().getLocation()).isEqualTo(new URI("http://localhost:8080" + GREETINGS_RESOURCE_URL + "/" + expectedGreetingId));
+        assertThat(response.getHeaders().getLocation()).isEqualTo(URI.create("http://localhost:8080" + GREETINGS_RESOURCE_URL + "/" + expectedGreetingId));
         assertThat(response.getBody()).isEqualTo(new Greeting(expectedGreetingId, "Bonjour, Leia!"));
     }
 
@@ -149,17 +151,14 @@ public class GreetingsControllerIT {
     }
 
     private ResponseEntity<ErrorObject<String>> postInvalidData() throws Exception {
-        Object invalidData = null;
-        MultiValueMap<String, String> contentTypeIsApplicationJsonHeader = new LinkedMultiValueMap<>();
-        contentTypeIsApplicationJsonHeader.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        RequestEntity<?> requestEntity = new RequestEntity<>(invalidData, contentTypeIsApplicationJsonHeader, HttpMethod.POST, new URI(GREETINGS_RESOURCE_URL));
-        return client.exchange(requestEntity, new ParameterizedTypeReference<ErrorObject<String>>() {
+        RequestEntity<Object> postInvalidDataRequest = RequestEntity.post(URI.create(GREETINGS_RESOURCE_URL)).header(CONTENT_TYPE, APPLICATION_JSON_VALUE).body(null);
+        return client.exchange(postInvalidDataRequest, new ParameterizedTypeReference<ErrorObject<String>>() {
         });
     }
 
     private ResponseEntity<ErrorObject<List<String>>> postErroneousPerson(Person erroneousPerson) throws Exception {
-        RequestEntity<Person> requestEntity = new RequestEntity<>(erroneousPerson, HttpMethod.POST, new URI(GREETINGS_RESOURCE_URL));
-        return client.exchange(requestEntity, new ParameterizedTypeReference<ErrorObject<List<String>>>() {
+        RequestEntity<Person> postErroneousPersonRequest = RequestEntity.post(URI.create(GREETINGS_RESOURCE_URL)).body(erroneousPerson);
+        return client.exchange(postErroneousPersonRequest, new ParameterizedTypeReference<ErrorObject<List<String>>>() {
         });
     }
 

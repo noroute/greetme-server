@@ -27,7 +27,7 @@ public class GoogleTranslateClient {
     private static final String SOURCE_LANGUAGE_CODE_TEMPLATE = "%s";
     private static final String TARGET_LANGUAGE_CODE_TEMPLATE = "%s";
     private static final String TEXT_TO_TRANSLATE_TEMPLATE = "%s";
-    private static final String TRANSLATE_URL_TEMPLATE = BASE_URL_TEMPLATE +
+    private static final String GOOGLE_TRANSLATE_URL_TEMPLATE = BASE_URL_TEMPLATE +
             "/translate_a/single" +
             "?client=gtx" +
             "&sl=" + SOURCE_LANGUAGE_CODE_TEMPLATE +
@@ -35,12 +35,12 @@ public class GoogleTranslateClient {
             "&dt=t" +
             "&q=" + TEXT_TO_TRANSLATE_TEMPLATE;
 
-    private final String translateBaseUrl;
+    private final String googleTranslateBaseUrl;
     private final RestTemplate client = new RestTemplate();
 
     @Autowired
     public GoogleTranslateClient(@Value("${google.translate.baseurl}") String googleTranslateBaseUrl) {
-        translateBaseUrl = googleTranslateBaseUrl;
+        this.googleTranslateBaseUrl = googleTranslateBaseUrl;
     }
 
     public String translate(String text, String sourceLanguageCode, String targetLanguageCode) {
@@ -53,7 +53,7 @@ public class GoogleTranslateClient {
     }
 
     private URI createTranslationUrl(String text, String sourceLanguageCode, String targetLanguageCode) {
-        String urlString = String.format(TRANSLATE_URL_TEMPLATE, translateBaseUrl, sourceLanguageCode, targetLanguageCode, encodeText(text));
+        String urlString = String.format(GOOGLE_TRANSLATE_URL_TEMPLATE, googleTranslateBaseUrl, sourceLanguageCode, targetLanguageCode, encodeText(text));
         URI uri = URI.create(urlString);
         log.debug("Google Translate URL: {}", uri);
         return uri;

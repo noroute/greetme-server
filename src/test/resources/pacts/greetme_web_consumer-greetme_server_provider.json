@@ -7,7 +7,7 @@
     },
     "interactions": [
         {
-            "description": "GET /greetings responds with array containing greeting(s)",
+            "description": "GET /greetings gets array containing greeting(s)",
             "request": {
                 "method": "GET",
                 "path": "/greetings"
@@ -68,7 +68,37 @@
             }
         },
         {
-            "description": "POST /greetings responds with Bad Request when validation failed",
+            "description": "POST /greetings with empty body causes Bad Request (invalid JSON body)",
+            "request": {
+                "method": "POST",
+                "path": "/greetings",
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": ""
+            },
+            "response": {
+                "status": 400,
+                "headers": {
+                    "Content-Type": "application/json;charset=UTF-8"
+                },
+                "body": {
+                    "error_details": "Required request body is missing",
+                    "error_id": "6ffefc8d-d9e7-4b76-bf14-c90391522066",
+                    "error_message": "Invalid JSON body"
+                },
+                "matchingRules": {
+                    "$.body.error_details": {
+                        "regex": "Required request body is missing.*"
+                    },
+                    "$.body.error_id": {
+                        "regex": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+                    }
+                }
+            }
+        },
+        {
+            "description": "POST /greetings with invalid person data causes Bad Request (validation failed)",
             "request": {
                 "method": "POST",
                 "path": "/greetings",
@@ -89,7 +119,7 @@
                     "error_details": [
                         "nativeLanguageCode must be an ISO 639 language code"
                     ],
-                    "error_id": "477eff52-2457-4cd4-9cea-5330dcd55513",
+                    "error_id": "6ffefc8d-d9e7-4b76-bf14-c90391522066",
                     "error_message": "Validation failed"
                 },
                 "matchingRules": {

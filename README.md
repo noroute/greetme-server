@@ -1,20 +1,68 @@
-# OpenShift Demo-Applikationen #
+# About
 
-## Referenzen ##
+_GreetMe Server_ is a trivial service that provides personalized greeting messages in different languages to clients. (A
+corresponding client is the web frontend _GreetMe Web_.)
+ 
+It is merely a simple demo application that was used for winning insights of the build, deployment, and management possibilities
+provided by PaaS solutions.
 
-### OpenShift logging ###
+# Example requests
 
- * ElasticSearch, FluentD, Kibana, ähnlich ELK
- * enthält Auth-Proxy für Log-Trennung nach Namespaces 
- * https://docs.openshift.com/enterprise/3.1/install_config/aggregate_logging.html
+## Create a "Hello, Bob!" greeting for a person named Bob in English
+Request:
+```
+curl -X POST -H 'Content-Type: application/json' -d '{"name": "Bob", "nativeLanguageCode": "en"}' localhost:8080/greetings
+```
+Response:
+```
+{
+  "id": 1,
+  "message": "Hello, Bob!"
+}
+```
 
-### OpenShift metrics ###
+## Get all greeting messages that have been created
+Request:
+```
+curl localhost:8080/greetings
+```
+Response, assuming a french greeting for Alice has been created additionally to that for Bob:
+```
+[
+  {
+    "id": 1,
+    "message": "Hello, Bob!"
+  },
+  {
+    "id": 2,
+    "message": "Bonjour, Alice!"
+  }
+]
 
- * Default für Cluster metrics (nur usage (CPU, Mem, Network)) ist Hawkular
-   (https://docs.openshift.org/latest/install_config/cluster_metrics.html)
- * es existiert eine Erweiterung
-   [Hawkular APM](http://www.hawkular.org/hawkular-apm/), die Performace metrics
-   (REST, OpenTracing) via JavaAgent liefern kann
- * Beispielhafte Integration von Prometheus wird
-   [hier](http://www.openpersuasion.org/prometheus-monitoring-in-openshift/)
-   beschrieben.
+```
+
+## Get a single, already created greeting message
+Request:
+```
+curl localhost:8080/greetings/2
+```
+Response:
+```
+{
+  "id": 2,
+  "message": "Bonjour, Alice!"
+}
+```
+
+# Characteristics
+_GreetMe Server_ contains:
+* different types of automated tests: unit, component, integration, and consumer-driven contract tests
+* externalized configuration
+* a connection to an external service for all non-English translations of "hello"
+* password secured metrics (e.g. for monitoring)
+* logging
+* error handling
+
+# Missing characteristics
+_GreetMe Server_ does not contain:
+* persistent state / attachment of storage

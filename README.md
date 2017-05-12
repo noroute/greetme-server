@@ -54,6 +54,9 @@ Response:
 }
 ```
 
+# Run it as backend for _GreetMe Web_
+Change the port settings from 8080/8081 to 9090/9091 by setting the system property `-Dspring.profiles.active=prod`.
+
 # Characteristics
 _GreetMe Server_ contains:
 * different types of automated tests: unit, component, integration, and consumer-driven contract tests

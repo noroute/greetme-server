@@ -10,6 +10,17 @@ parameters:
     required: true
 objects:
 - apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: greetme-server
+      application: greetme
+    name: greetme-server
+- apiVersion: v1
   kind: BuildConfig
   metadata:
     annotations:
@@ -152,14 +163,3 @@ objects:
       name: greetme-server
       weight: 100
     wildcardPolicy: None
-- apiVersion: v1
-  kind: ImageStream
-  metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftWebConsole
-    creationTimestamp: null
-    generation: 1
-    labels:
-      app: greetme-server
-      application: greetme
-    name: greetme-server

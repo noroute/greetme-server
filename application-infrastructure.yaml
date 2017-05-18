@@ -112,7 +112,7 @@ objects:
         - greetme-server
         from:
           kind: ImageStreamTag
-          name: greetme-server:latest
+          name: greetme-server:${STAGE}
           namespace: ${BASENAME}-dev
       type: ImageChange
 - apiVersion: v1

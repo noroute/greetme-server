@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
@@ -39,6 +40,9 @@ public class GreetingsControllerIT {
     private static final String ENGLISH = Locale.ENGLISH.getLanguage();
     private static final String FRENCH = Locale.FRENCH.getLanguage();
 
+    @LocalServerPort
+    private int port;
+
     @Autowired
     private TestRestTemplate client;
 
@@ -56,7 +60,7 @@ public class GreetingsControllerIT {
         // then
         long expectedGreetingId = 1;
         assertThat(response.getStatusCode()).isEqualTo(CREATED);
-        assertThat(response.getHeaders().getLocation()).isEqualTo(URI.create("http://localhost:8080" + GREETINGS_RESOURCE_URL + "/" + expectedGreetingId));
+        assertThat(response.getHeaders().getLocation()).isEqualTo(URI.create("http://localhost:" + port + GREETINGS_RESOURCE_URL + "/" + expectedGreetingId));
         assertThat(response.getBody()).isEqualTo(new Greeting(expectedGreetingId, "Bonjour, Leia!"));
     }
 

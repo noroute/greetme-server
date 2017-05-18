@@ -28,13 +28,13 @@ import static org.junit.Assert.fail;
 @PactFolder("pacts")
 public class PactsIT {
 
-    private static final int DEFAULT_PORT = 8080;
+    private static final int PORT = 10080;
 
     private static boolean thisTestControlsSpringApplicationLifecycle = false;
     private static Lifecycle applicationLifecycle;
 
     @TestTarget
-    public final Target target = new HttpTarget(DEFAULT_PORT);
+    public final Target target = new HttpTarget(PORT);
 
     // How to do it better with SpringClassRule, SpringMethodRule, and @SpringBootTest?
     // Alternatively, try https://github.com/realestate-com-au/pact-jvm-provider-spring-mvc
@@ -58,7 +58,7 @@ public class PactsIT {
     }
 
     private static Invocation.Builder greetingsRequest() {
-        return ClientBuilder.newClient().target("http://localhost:" + DEFAULT_PORT).path("/greetings").request();
+        return ClientBuilder.newClient().target("http://localhost:" + PORT).path("/greetings").request();
     }
 
     @State("at_least_one_greeting")

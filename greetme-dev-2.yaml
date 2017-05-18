@@ -93,7 +93,7 @@ items:
         from:
           kind: ImageStreamTag
           name: greetme-server:latest
-          namespace: greetme-workshop
+          namespace: greetme-dev-2
       type: ImageChange
 - apiVersion: v1
   kind: Service
